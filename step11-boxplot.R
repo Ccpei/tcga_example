@@ -29,6 +29,7 @@ head(mut)
 dat=data.frame(gene=log2(exprSet['hsa-mir-10b',]+1),
                stage=phe$stage)
 head(dat)
+boxplot(dat$gene~dat$stage)
 if(require('ggpubr')){
   library(ggpubr)
   # google search : ggpubr boxplot add p-value

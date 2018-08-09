@@ -55,18 +55,21 @@ if(! require("ggstatsplot")) install.packages("ggstatsplot")
 
 ### 下面的包是为了临床三线表
 if(! require("tableone")) install.packages("tableone")
-## 网络不好，就不要安装了。
-## 而且Windows电脑安装 rJava 也经常是需要人指导的。
-# https://github.com/rstudio/rstudio/issues/2254
-if(! require("rJava")) install.packages("rJava")
-if(require('rJava')){
+if(F){
+  ## 网络不好，就不要安装了。
+  ## 而且Windows电脑安装 rJava 也经常是需要人指导的。
+  # https://github.com/rstudio/rstudio/issues/2254
+  if(! require("rJava")) install.packages("rJava")
+  if(require('rJava')){
+    
+    # https://cran.r-project.org/src/contrib/Archive/ReporteRs/
+    if(! require("ReporteRs")) install.packages("ReporteRs")
+    devtools::install_github('davidgohel/ReporteRsjars')
+    devtools::install_github('davidgohel/ReporteRs')
+  }
   
-  # https://cran.r-project.org/src/contrib/Archive/ReporteRs/
-  if(! require("ReporteRs")) install.packages("ReporteRs")
-  devtools::install_github('davidgohel/ReporteRsjars')
-  devtools::install_github('davidgohel/ReporteRs')
 }
- 
+
 
 library(devtools) 
 source("http://bioconductor.org/biocLite.R") 

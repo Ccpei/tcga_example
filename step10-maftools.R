@@ -51,7 +51,7 @@ laml.mutload = tcgaCompare(maf = laml, cohortName = project)
 dev.off()
 
 png(paste0('Vaf_',project,'.png'),res = 150,width = 1080,height = 1080)
-plotVaf(maf = laml,violin = F,top = 20)
+plotVaf(maf = laml ,top = 20)
 dev.off()
 
 if(F){

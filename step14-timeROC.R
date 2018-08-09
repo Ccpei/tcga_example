@@ -52,7 +52,7 @@ with(new_dat,
                      marker=fp,#预测变量 
                      cause=1,#阳性结局赋值，比如死亡与否
                      weighting="marginal",#权重计算方法，marginal是默认值，采用km计算删失分布
-                     times=c(60,100),#时间点，选取10年和20年生存率
+                     times=c(60,100),#时间点，选取5年(60个月)和8年生存率
                      ROC = TRUE,
                      iid = TRUE)
 )
