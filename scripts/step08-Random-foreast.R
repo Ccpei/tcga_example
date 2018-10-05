@@ -8,26 +8,44 @@
 ### Forum:  http://www.biotrainee.com/thread-1376-1-1.html
 ### CAFS/SUSTC/Eli Lilly/University of Macau
 ### Update Log: 2018-08-10  First version
+### Update Log: 2018-10-10  second version
 ###
 ### ---------------
+
 
 ### https://github.com/jmzeng1314/ML
 
 rm(list=ls())
+options(stringsAsFactors = F)
 Sys.setenv(R_MAX_NUM_DLLS=999)
-library(survival)
-library(survminer)
-load(file = 'TCGA-KIRC-miRNA-example.Rdata')
-group_list=ifelse(substr(colnames(expr),14,15)=='01','tumor','normal')
+
+Rdata_dir='../Rdata/'
+Figure_dir='../figures/'
+load( file = 
+        file.path(Rdata_dir,'TCGA-KIRC-miRNA-example.Rdata')
+)
+dim(expr)
+dim(meta)
+group_list=ifelse(as.numeric(substr(colnames(expr),14,15)) < 10,'tumor','normal')
 table(group_list)
-load(file='survival_input.Rdata')
+
+exprSet=na.omit(expr)
+
+load(  file = 
+         file.path(Rdata_dir,'TCGA-KIRC-miRNA-survival_input.Rdata')
+)
 head(phe)
 exprSet[1:4,1:4]
+ 
 
 library(randomForest)
 library(ROCR)
 library(genefilter)
 library(Hmisc)
+head(colnames(exprSet))
+head(phe$ID)
+## 必须保证生存资料和表达矩阵，两者一致
+all(substring(colnames(exprSet),1,12)==phe$ID)
 
 x=t(log2(exprSet+1))
 y=phe$event
@@ -37,12 +55,13 @@ tmp = as.vector(table(y))
 num_classes = length(tmp)
 min_size = tmp[order(tmp,decreasing=FALSE)[1]]
 sampsizes = rep(min_size,num_classes)
+tmp_rf=file.path(Rdata_dir,'TCGA_KIRC_miRNA_rf_output.Rdata')
 
-if(!file.exists('TCGA_KIRC_miRNA_rf_output.Rdata')){
+if(!file.exists(tmp_rf)){
   rf_output=randomForest(x=x, y=y,importance = TRUE, ntree = 10001, proximity=TRUE )
-  save(rf_output,file = 'TCGA_KIRC_miRNA_rf_output.Rdata')
+  save(rf_output,file = tmp_rf)
 }
-load(file = 'TCGA_KIRC_miRNA_rf_output.Rdata')
+load(file = tmp_rf)
 rf_output
 str(rf_output)
 

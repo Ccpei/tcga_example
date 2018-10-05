@@ -8,6 +8,7 @@
 ### Forum:  http://www.biotrainee.com/thread-1376-1-1.html
 ### CAFS/SUSTC/Eli Lilly/University of Macau
 ### Update Log: 2018-08-010  First version
+### Update Log: 2018-10-10  second version
 ###
 ### ---------------
 
@@ -27,12 +28,14 @@
 #  Successfully downloaded: 567
 #  或者直接从微云下载：链接：https://share.weiyun.com/5XsyuzH 密码：68pm7e 
 
+rm(list=ls())
+options(stringsAsFactors = F)
+
 m='GDC/gdc_manifest.2018-08-05-clinical.txt'
 x1=read.table(m,header = T) 
 m='GDC/gdc_manifest.2018-08-05-LUAD-miRNA-seq.txt'
 x2=read.table(m,header = T) 
 
-rm(list=ls())
 # Load the packages required to read XML files.
 library("XML")
 library("methods")

@@ -8,8 +8,14 @@
 ### Forum:  http://www.biotrainee.com/thread-1376-1-1.html
 ### CAFS/SUSTC/Eli Lilly/University of Macau
 ### Update Log: 2018-08-10  First version
+### Update Log: 2018-10-10  second version
 ###
 ### ---------------
+rm(list=ls())
+options(stringsAsFactors = F)
+
+Rdata_dir='../Rdata/'
+Figure_dir='../figures/'
 
 if(F){ 
   options("repos" = c(CRAN="https://mirrors.tuna.tsinghua.edu.cn/CRAN/"))
@@ -62,9 +68,13 @@ if(F){
                            'patient.stage_event.pathologic_stage')])
   #meta[(grepl('patient.stage_event.pathologic_stage',colnames(meta)))]
   
-  save(expr,meta,file = 'TCGA-KIRC-miRNA-example.Rdata')
+  save(expr,meta,
+       file = file.path(Rdata_dir,'TCGA-KIRC-miRNA-example.Rdata')
+         )
 }
-rm(list=ls())
-load(file = 'TCGA-KIRC-miRNA-example.Rdata')
+
+load( file = 
+        file.path(Rdata_dir,'TCGA-KIRC-miRNA-example.Rdata')
+)
 dim(expr)
 dim(meta)

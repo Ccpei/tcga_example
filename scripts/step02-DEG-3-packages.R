@@ -8,18 +8,29 @@
 ### Forum:  http://www.biotrainee.com/thread-1376-1-1.html
 ### CAFS/SUSTC/Eli Lilly/University of Macau
 ### Update Log: 2018-08-010  First version
+### Update Log: 2018-10-10  second version
 ###
 ### ---------------
 
 ### https://github.com/jmzeng1314/GEO/blob/master/airway/DEG_rnsseq.R
 
 rm(list=ls())
-load(file = 'TCGA-KIRC-miRNA-example.Rdata')
+options(stringsAsFactors = F)
+
+Rdata_dir='../Rdata/'
+Figure_dir='../figures/'
+load( file = 
+        file.path(Rdata_dir,'TCGA-KIRC-miRNA-example.Rdata')
+)
 dim(expr)
-group_list=ifelse(substr(colnames(expr),14,15)=='01','tumor','normal')
+dim(meta)
+
+group_list=ifelse(as.numeric(substr(colnames(expr),14,15)) < 10,'tumor','normal')
+
 table(group_list)
 exprSet=na.omit(expr)
-source('functions.R')
+source('../functions.R')
+
 ### ---------------
 ###
 ### Firstly run DESeq2 
@@ -34,11 +45,12 @@ if(T){
   dds <- DESeqDataSetFromMatrix(countData = exprSet,
                                 colData = colData,
                                 design = ~ group_list)
-  if(!file.exists('DESeq2-dds.Rdata')){
+  tmp_f=file.path(Rdata_dir,'TCGA-KIRC-miRNA-DESeq2-dds.Rdata')
+  if(!file.exists(tmp_f)){
     dds <- DESeq(dds)
-    save(dds,file = 'DESeq2-dds.Rdata')
+    save(dds,file = tmp_f)
   }
-  load(file = 'DESeq2-dds.Rdata')
+  load(file = tmp_f)
   res <- results(dds, 
                  contrast=c("group_list","tumor","normal"))
   resOrdered <- res[order(res$padj),]
@@ -47,8 +59,7 @@ if(T){
   DESeq2_DEG = na.omit(DEG)
   
   nrDEG=DESeq2_DEG[,c(2,6)]
-  colnames(nrDEG)=c('log2FoldChange','pvalue') 
-  source('functions.R')
+  colnames(nrDEG)=c('log2FoldChange','pvalue')  
   draw_h_v(exprSet,nrDEG,'DEseq2',group_list,1)
 }
 
@@ -83,8 +94,7 @@ if(T){
   head(nrDEG)
   edgeR_DEG =nrDEG 
   nrDEG=edgeR_DEG[,c(1,5)]
-  colnames(nrDEG)=c('log2FoldChange','pvalue')
-  source('functions.R')
+  colnames(nrDEG)=c('log2FoldChange','pvalue') 
   draw_h_v(exprSet,nrDEG,'edgeR',group_list,1)
   
 }
@@ -118,19 +128,15 @@ if(T){
   DEG_limma_voom = na.omit(tempOutput)
   head(DEG_limma_voom)
   nrDEG=DEG_limma_voom[,c(1,4)]
-  colnames(nrDEG)=c('log2FoldChange','pvalue')
-  source('functions.R') 
+  colnames(nrDEG)=c('log2FoldChange','pvalue') 
   draw_h_v(exprSet,nrDEG,'limma',group_list,1)
   
 }
 
-save(DEG_limma_voom,DESeq2_DEG,edgeR_DEG, 
-     file = 'DEG_results.Rdata')
+tmp_f=file.path(Rdata_dir,'TCGA-KIRC-miRNA-DEG_results.Rdata')
+save(DEG_limma_voom,DESeq2_DEG,edgeR_DEG, file = tmp_f)
 
-
-rm(list = ls())
-load(file = 'DEG_results.Rdata')
-source('functions.R')
+load(file = tmp_f) 
 
 nrDEG1=DEG_limma_voom[,c(1,4)]
 colnames(nrDEG1)=c('log2FoldChange','pvalue') 

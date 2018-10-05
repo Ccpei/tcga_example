@@ -8,18 +8,37 @@
 ### Forum:  http://www.biotrainee.com/thread-1376-1-1.html
 ### CAFS/SUSTC/Eli Lilly/University of Macau
 ### Update Log: 2018-08-10  First version
+### Update Log: 2018-10-10  second version
 ###
 ### ---------------
 
 ### https://github.com/jmzeng1314/GEO/blob/master/GSE11121/step5-surivival.R
 
-#rm(list=ls())
-load(file = 'TCGA-KIRC-miRNA-example.Rdata')
-group_list=ifelse(substr(colnames(expr),14,15)=='01','tumor','normal')
+rm(list=ls())
+options(stringsAsFactors = F)
+
+Rdata_dir='../Rdata/'
+Figure_dir='../figures/'
+load( file = 
+        file.path(Rdata_dir,'TCGA-KIRC-miRNA-example.Rdata')
+)
+dim(expr)
+dim(meta)
+group_list=ifelse(as.numeric(substr(colnames(expr),14,15)) < 10,'tumor','normal')
 table(group_list)
-load(file='survival_input.Rdata')
+
+exprSet=na.omit(expr)
+
+load(  file = 
+         file.path(Rdata_dir,'TCGA-KIRC-miRNA-survival_input.Rdata')
+)
 head(phe)
 exprSet[1:4,1:4]
+
+
+
+library(survival)
+library(survminer)
 
 ## 批量生存分析 使用 coxph 回归方法
 # http://www.sthda.com/english/wiki/cox-proportional-hazards-model
@@ -50,6 +69,31 @@ cox_results <-apply(exprSet , 1 , function(gene){
 cox_results=t(cox_results)
 table(cox_results[,4]<0.05)
 cox_results[cox_results[,4]<0.05,]
+
+## 批量生存分析 使用  logrank test 方法
+mySurv=with(phe,Surv(time, event))
+log_rank_p <- apply(exprSet , 1 , function(gene){
+  # gene=exprSet[1,]
+  phe$group=ifelse(gene>median(gene),'high','low')  
+  data.survdiff=survdiff(mySurv~group,data=phe)
+  p.val = 1 - pchisq(data.survdiff$chisq, length(data.survdiff$n) - 1)
+  return(p.val)
+})
+
+require("VennDiagram")
+VENN.LIST=list(cox=rownames(cox_results[cox_results[,4]<0.05,]),
+             log=names(log_rank_p[log_rank_p<0.05]))
+venn.plot <- venn.diagram(VENN.LIST , NULL, 
+                          fill=c("darkmagenta", "darkblue"), 
+                          alpha=c(0.5,0.5), cex = 2, 
+                          cat.fontface=4,  
+                          main="overlap of coxph and log-rank test")
+grid.draw(venn.plot) 
+
+save(log_rank_p,cox_results ,
+     file = 
+       file.path(Rdata_dir,'TCGA-KIRC-miRNA-survival_results.Rdata')
+)
  
 library(pheatmap)
 choose_gene=rownames(cox_results[cox_results[,4]<0.05,])
@@ -69,19 +113,6 @@ df$group=group_list
 png('cox_genes.pca.png',res=120)
 autoplot(prcomp( df[,1:(ncol(df)-1)] ), data=df,colour = 'group')+theme_bw()
 dev.off()
-
-
-
-length(setdiff(rownames(cox_results[cox_results[,4]<0.05,]),
-               names(log_rank_p[log_rank_p<0.05])
-))
-length(setdiff( names(log_rank_p[log_rank_p<0.05]),
-                rownames(cox_results[cox_results[,4]<0.05,])
-))
-length(unique( names(log_rank_p[log_rank_p<0.05]),
-               rownames(cox_results[cox_results[,4]<0.05,])
-))
-save(log_rank_p,cox_results ,file = 'surviva.Rdata')
 
 
 

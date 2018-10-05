@@ -20,6 +20,12 @@
 # The eight-miRNA signature is an independent prognostic marker of OS of LUAD patients and demonstrates good performance for predicting 5-year OS (Area Under the respective ROC Curves [AUC] = 0.626, P = 0.003), especially for non-smokers (AUC = 0.686, P = 0.023).
 
 rm(list=ls())
+options(stringsAsFactors = F)
+
+Rdata_dir='../Rdata/'
+Figure_dir='../figures/'
+
+
 library(survival)
 library(survminer)
 if(F){
@@ -58,14 +64,14 @@ if(F){
                             'patient.stage_event.pathologic_stage')])
   #meta[(grepl('patient.stage_event.pathologic_stage',colnames(meta)))]
   
-  save(expr,meta,file = 'TCGA-LUAD-miRNA-example.Rdata')
+  save(expr,meta,file = file.path(Rdata_dir,'TCGA-LUAD-miRNA-example.Rdata'))
 } 
-load(file = 'TCGA-LUAD-miRNA-example.Rdata')
+load(file = file.path(Rdata_dir,'TCGA-LUAD-miRNA-example.Rdata'))
 
-group_list=ifelse(substr(colnames(expr),14,15)=='01','tumor','normal')
+group_list=ifelse(as.numeric(substr(colnames(expr),14,15)) < 10,'tumor','normal')
 table(group_list)
 
-if(!file.exists('TCGA-LUAD-survival_input.Rdata')){
+if(F){
   exprSet=na.omit(expr)
   exprSet=exprSet[,group_list=='tumor']
   
@@ -96,10 +102,10 @@ if(!file.exists('TCGA-LUAD-survival_input.Rdata')){
   head(phe)
   exprSet[1:4,1:4]
   
-  save(exprSet,phe,file='TCGA-LUAD-survival_input.Rdata')
+  save(exprSet,phe,file=file.path(Rdata_dir,'TCGA-LUAD-survival_input.Rdata'))
 }
 
-load(file='TCGA-LUAD-survival_input.Rdata')
+load(file=file.path(Rdata_dir,'TCGA-LUAD-survival_input.Rdata'))
 head(phe)
 exprSet[1:4,1:4]
 

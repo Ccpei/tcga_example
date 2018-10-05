@@ -8,24 +8,34 @@
 ### Forum:  http://www.biotrainee.com/thread-1376-1-1.html
 ### CAFS/SUSTC/Eli Lilly/University of Macau
 ### Update Log: 2018-08-10  First version
+### Update Log: 2018-10-10  second version
 ###
 ### ---------------
 
 ### https://github.com/jmzeng1314/GEO/blob/master/GSE11121/step5-surivival.R
-# 进行COX比例风险模型。
-# HR = 1: 无影响
-# HR < 1: 风险降低
-# HR > 1: 风险增高
 
 rm(list=ls())
-library(survival)
-library(survminer)
-load(file = 'TCGA-KIRC-miRNA-example.Rdata')
-group_list=ifelse(substr(colnames(expr),14,15)=='01','tumor','normal')
+options(stringsAsFactors = F)
+
+Rdata_dir='../Rdata/'
+Figure_dir='../figures/'
+load( file = 
+        file.path(Rdata_dir,'TCGA-KIRC-miRNA-example.Rdata')
+)
+dim(expr)
+dim(meta)
+group_list=ifelse(as.numeric(substr(colnames(expr),14,15)) < 10,'tumor','normal')
+
 table(group_list)
-load(file='survival_input.Rdata')
+exprSet=na.omit(expr)
+
+load(  file = 
+         file.path(Rdata_dir,'TCGA-KIRC-miRNA-survival_input.Rdata')
+)
 head(phe)
 exprSet[1:4,1:4]
+
+
 ## 挑选感兴趣的基因构建coxph模型 
 # 2015-TCGA-ccRCC-5-miRNAs-signatures
 # Integrated genomic analysis identifies subclasses and prognosis signatures of kidney cancer
