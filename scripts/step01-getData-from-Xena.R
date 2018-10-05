@@ -8,6 +8,7 @@
 ### Forum:  http://www.biotrainee.com/thread-1376-1-1.html
 ### CAFS/SUSTC/Eli Lilly/University of Macau
 ### Update Log: 2018-08-10  First version
+### Update Log: 2018-10-10  second version
 ###
 ### ---------------
 
@@ -16,15 +17,21 @@
 
 rm(list=ls())
 options(stringsAsFactors = F)
-if(file.exists('UCSC-XENA/miRNA_GA_gene.gz')){
+d='../Rdata/KIRC-UCSC-XENA/'
+## too many NA in the miRNA expression matrix from XENA
+
+if(file.exists(file.path(d,'miRNA_GA_gene.gz'))){
   
-  miRNA_GA=read.table('UCSC-XENA/miRNA_GA_gene.gz',header = T,sep = '\t')
+  miRNA_GA=read.table(file.path(d,'miRNA_GA_gene.gz'),header = T,sep = '\t')
   dim(miRNA_GA)
   miRNA_GA[1:4,1:4]
+  na.omit(miRNA_GA)[1:4,1:4]
   dim(na.omit(miRNA_GA))
-  miRNA_HiSeq=read.table('UCSC-XENA/miRNA_HiSeq_gene.gz',header = T,sep = '\t')
+  
+  miRNA_HiSeq=read.table(file.path(d,'miRNA_HiSeq_gene.gz') ,header = T,sep = '\t')
   dim(miRNA_HiSeq)
   miRNA_HiSeq[1:4,1:4]
+  na.omit(miRNA_HiSeq)[1:4,1:4]
   dim(na.omit(miRNA_HiSeq))
 }
 
