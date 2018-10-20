@@ -11,11 +11,12 @@
 ###
 ### ---------------
 rm(list=ls())
-load(file = 'TCGA_KIRC_mut.Rdata')
-load(file = 'TCGA-KIRC-miRNA-example.Rdata')
-group_list=ifelse(substr(colnames(expr),14,15)=='01','tumor','normal')
+load(file = '../Rdata/TCGA_KIRC_mut.Rdata')
+load(file = '../Rdata/TCGA-KIRC-miRNA-example.Rdata')
+group_list=ifelse(as.numeric(substr(colnames(expr),14,15)) < 10,'tumor','normal')
+
 table(group_list)
-load(file='survival_input.Rdata')
+load(file='../Rdata/survival_input.Rdata')
 ## 挑选感兴趣的miRNA来画表达差异的boxplot
 # 2015-TCGA-ccRCC-5-miRNAs-signatures
 # Integrated genomic analysis identifies subclasses and prognosis signatures of kidney cancer
@@ -29,6 +30,7 @@ head(mut)
 dat=data.frame(gene1=log2(exprSet['hsa-mir-10b',]+1),
                gene2=log2(exprSet['hsa-mir-143',]+1),
                stage=phe$stage)
+save(dat,file = 'for_scatter.Rdata')
 library(ggpubr)
 # google search : ggpubr boxplot add p-value
 # http://www.sthda.com/english/rpkgs/ggpubr/reference/stat_cor.html 

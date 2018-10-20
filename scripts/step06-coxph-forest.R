@@ -16,6 +16,8 @@
 
 rm(list=ls())
 options(stringsAsFactors = F)
+library(survival)
+library(survminer)
 
 Rdata_dir='../Rdata/'
 Figure_dir='../figures/'

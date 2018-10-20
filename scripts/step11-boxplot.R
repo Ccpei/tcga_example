@@ -11,11 +11,14 @@
 ###
 ### ---------------
 rm(list=ls())
-load(file = 'TCGA_KIRC_mut.Rdata')
-load(file = 'TCGA-KIRC-miRNA-example.Rdata')
-group_list=ifelse(substr(colnames(expr),14,15)=='01','tumor','normal')
+library(survival)
+library(survminer)
+load(file = '../Rdata/TCGA_KIRC_mut.Rdata')
+load(file = '../Rdata/TCGA-KIRC-miRNA-example.Rdata')
+group_list=ifelse(as.numeric(substr(colnames(expr),14,15)) < 10,'tumor','normal')
+
 table(group_list)
-load(file='survival_input.Rdata')
+load(file='../Rdata/survival_input.Rdata')
 ## 挑选感兴趣的miRNA来画表达差异的boxplot
 # 2015-TCGA-ccRCC-5-miRNAs-signatures
 # Integrated genomic analysis identifies subclasses and prognosis signatures of kidney cancer
@@ -28,6 +31,7 @@ head(phe)
 head(mut)
 dat=data.frame(gene=log2(exprSet['hsa-mir-10b',]+1),
                stage=phe$stage)
+save(dat,file = 'data_for_boxplot.Rdata')
 head(dat)
 boxplot(dat$gene~dat$stage)
 if(require('ggpubr')){
@@ -54,7 +58,10 @@ TukeyHSD(res.aov)
 
 
 tail(sort(table(mut$Hugo_Symbol)))
-VHL_mut=substr(as.character(as.data.frame(mut[mut$Hugo_Symbol=='VHL','Tumor_Sample_Barcode'])[,1]),1,12)
+VHL_mut=substr(as.character(
+  as.data.frame( mut[mut$Hugo_Symbol=='VHL','Tumor_Sample_Barcode'])[,1] ),
+  1,12)
+
 library(dplyr)
   mut  %>% 
   filter(Hugo_Symbol=='VHL')  %>%   
@@ -87,7 +94,7 @@ if(require('ggstatsplot')){
 if(require('ggplot2')){
   library(ggplot2)
   ggplot(dat,aes(x=mut,y=gene))+
-    geom_boxplot()+
+    geom_boxplot()+geom_jitter()+geom_violin()+
     theme_bw()
 }
 

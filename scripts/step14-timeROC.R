@@ -14,13 +14,16 @@
 ### https://github.com/jmzeng1314/ML
 
 rm(list=ls())
-Sys.setenv(R_MAX_NUM_DLLS=999)
+Sys.setenv(R_MAX_NUM_DLLS=999) 
 library(survival)
 library(survminer)
-load(file = 'TCGA-KIRC-miRNA-example.Rdata')
-group_list=ifelse(substr(colnames(expr),14,15)=='01','tumor','normal')
+load(file = '../Rdata/TCGA_KIRC_mut.Rdata')
+load(file = '../Rdata/TCGA-KIRC-miRNA-example.Rdata')
+group_list=ifelse(as.numeric(substr(colnames(expr),14,15)) < 10,'tumor','normal')
+
 table(group_list)
-load(file='survival_input.Rdata')
+load(file='../Rdata/survival_input.Rdata')
+
 head(phe)
 exprSet[1:4,1:4]
 
@@ -63,6 +66,20 @@ plot(ROC,time=100,col = "red",add = F)
 
 ROC$AUC
 confint(ROC)
+
+
+library(ROCR)
+library(glmnet)
+library(caret)
+lasso.prob <- predict(cv_fit, newx=x, s=c(cv_fit$lambda.min,cv_fit$lambda.1se) )
+re=cbind(phe$event ,lasso.prob)
+# calculate probabilities for TPR/FPR for predictions
+pred <- prediction(re[,2], re[,1])
+perf <- performance(pred,"tpr","fpr")
+performance(pred,"auc") # shows calculated AUC for model
+plot(perf,colorize=FALSE, col="black") # plot ROC curve
+lines(c(0,1),c(0,1),col = "gray", lty = 4 )
+
 
 
 

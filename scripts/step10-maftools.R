@@ -15,7 +15,7 @@ rm(list=ls())
 require(maftools) 
 options(stringsAsFactors = F) 
 
-laml = read.maf(maf = 'GDC/TCGA.KIRC.mutect.somatic.maf.gz')
+laml = read.maf(maf = '../GDC/TCGA.KIRC.mutect.somatic.maf.gz')
 laml 
 project='TCGA_KIRC'
 
@@ -76,7 +76,7 @@ mut$pos=paste(mut$Chromosome,mut$Start_Position,sep=':')
 
 tail(sort(table(mut$Hugo_Symbol)))
 
-save(mut,file = 'TCGA_KIRC_mut.Rdata')
+save(mut,file = '../Rdata/TCGA_KIRC_mut.Rdata')
 
 
 

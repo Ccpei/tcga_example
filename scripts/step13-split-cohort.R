@@ -14,21 +14,23 @@
 ### https://github.com/jmzeng1314/ML
 
 rm(list=ls())
-library(survival)
-library(survminer)
-load(file = 'TCGA-KIRC-miRNA-example.Rdata')
-group_list=ifelse(substr(colnames(expr),14,15)=='01','tumor','normal')
+load(file = '../Rdata/TCGA_KIRC_mut.Rdata')
+load(file = '../Rdata/TCGA-KIRC-miRNA-example.Rdata')
+group_list=ifelse(as.numeric(substr(colnames(expr),14,15)) < 10,'tumor','normal')
+
 table(group_list)
-load(file='survival_input.Rdata')
+load(file='../Rdata/survival_input.Rdata')
+
 head(phe)
 exprSet[1:4,1:4]
 
 dim(expr)
 set.seed(1234567890)
+#sample(1:10,3)
 k=sample(1:593,300)
 
-t_exp=expr[,k]
-v_exp=expr[,-k]
+t_exp=expr[,k] ##
+v_exp=expr[,-k]## 
 
 table(ifelse(substr(colnames(t_exp),14,15)=='01','tumor','normal'))
 table(ifelse(substr(colnames(v_exp),14,15)=='01','tumor','normal'))
@@ -38,6 +40,21 @@ v_tumor=t_exp[,substr(colnames(v_exp),14,15)=='01']
 
 t_phe= phe[match(substr(colnames(t_tumor),1,12),phe$ID),]
 v_phe=phe[match(substr(colnames(v_tumor),1,12),phe$ID),]
+table(t_phe$stage)
+table(v_phe$stage)
+
+
+if(F){
+  ## 切割数据 
+  library(caret)
+  set.seed(123456789)
+  sam<- createDataPartition(phe$event, p = .5,list = FALSE)
+  train <- phe[sam,]
+  test <- phe[-sam,]
+  #查看两组一些临床参数切割比例
+  prop.table(table(train$stage))
+  prop.table(table(test$stage)) 
+}
 
 head(t_phe)
 t_tumor[1:4,1:4]
@@ -52,7 +69,7 @@ c(cv_fit$lambda.min,cv_fit$lambda.1se)
 model_lasso <- glmnet(x=x, y=y, alpha = 1, lambda=cv_fit$lambda.1se)
 lasso.prob <- predict(cv_fit, newx=t(log2(v_tumor+1)) , s=c(cv_fit$lambda.min,cv_fit$lambda.1se) )
 re=cbind(v_phe$event ,lasso.prob)
-
+## https://vip.biotrainee.com/d/812-
 library(ROCR)
 library(glmnet)
 library(caret)

@@ -13,7 +13,12 @@
 
 rm(list=ls()) 
 
-if(!file.exists('TCGA-LUAD-phe_clinical_tables.Rdata')){
+Rdata_dir='../Rdata/'
+Figure_dir='../figures/'
+f=file.path(Rdata_dir,'TCGA-LUAD-phe_clinical_tables.Rdata')
+
+
+if(!file.exists(f)){
   library(RTCGA.clinical) 
   ??RTCGA.clinical
   meta <- LUAD.clinical
@@ -59,9 +64,11 @@ if(!file.exists('TCGA-LUAD-phe_clinical_tables.Rdata')){
   head(phe)
   phe$barcode=toupper(phe$barcode)  
   
-  save(phe,file='TCGA-LUAD-phe_clinical_tables.Rdata')
+  save(phe,file=f)
 }
-load(file='TCGA-LUAD-phe_clinical_tables.Rdata')
+load(file=f)
+
+
 clinical_info=phe
 head(clinical_info) 
 # https://cran.r-project.org/web/packages/tableone/vignettes/introduction.html

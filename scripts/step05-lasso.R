@@ -60,6 +60,15 @@ c(cv_fit$lambda.min,cv_fit$lambda.1se)
 model_lasso <- glmnet(x=x, y=y, alpha = 1, lambda=cv_fit$lambda.1se)
 lasso.prob <- predict(cv_fit, newx=x , s=c(cv_fit$lambda.min,cv_fit$lambda.1se) )
 re=cbind(y ,lasso.prob)
+dat=as.data.frame(re[,1:2])
+colnames(dat)=c('event','prob')
+dat$event=as.factor(dat$event)
+library(ggpubr) 
+p <- ggboxplot(dat, x = "event", y = "prob",
+               color = "event", palette = "jco",
+               add = "jitter")
+#  Add p-value
+p + stat_compare_means()
 
 library(ROCR)
 library(glmnet)

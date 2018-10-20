@@ -108,6 +108,7 @@ if(F){
 load(file=file.path(Rdata_dir,'TCGA-LUAD-survival_input.Rdata'))
 head(phe)
 exprSet[1:4,1:4]
+dim(exprSet)
 
 ## 挑选感兴趣的基因构建coxph模型 
 
@@ -136,10 +137,10 @@ ggforest(model, data =dat,
 # 对于生存数据预后模型评价很多采用C-index ，但c-index展示没有roc曲线图来的直观
 new_dat=dat
 
-fp <- predict(model,new_dat,type="risk")
-fp <- predict(model,new_dat,type="expected") 
+fp <- predict(model,new_dat,type="risk");boxplot(fp)
+fp <- predict(model,new_dat,type="expected") ;boxplot(fp)
 plot(fp,phe$days)
-fp <- predict(model,new_dat) 
+fp <- predict(model,new_dat) ;boxplot(fp)
 basehaz(model) 
 library(Hmisc)
 options(scipen=200)
@@ -155,12 +156,14 @@ sur_dat=data.frame(s=1:length(fp),
                    e=phe[names(sort(fp )),'event']  ) 
 sur_dat$e=ifelse(sur_dat$e==0,'alive','death')
 exp_dat=new_dat[names(sort(fp )),10:17]
-plot.point=ggplot(fp_dat,aes(x=s,y=v))+geom_point()
-plot.sur=ggplot(sur_dat,aes(x=s,y=t))+geom_point(aes(col=e))
+plot.point=ggplot(fp_dat,aes(x=s,y=v))+geom_point();print(plot.point)
+plot.sur=ggplot(sur_dat,aes(x=s,y=t))+geom_point(aes(col=e));print(plot.sur)
+
 mycolors <- colorRampPalette(c("black", "green", "red"), bias = 1.2)(100)
 tmp=t(scale(exp_dat))
 tmp[tmp > 1] = 1
 tmp[tmp < -1] = -1
+plot.h=pheatmap(tmp,col= mycolors,show_colnames = F,cluster_cols = T)
 plot.h=pheatmap(tmp,col= mycolors,show_colnames = F,cluster_cols = F)
 plot_grid(plot.point, plot.sur, plot.h$gtable,
           labels = c("A", "B","C"),
